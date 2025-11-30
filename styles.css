@@ -1,11 +1,11 @@
 body {
-  font-family: Arial, sans-serif;
+  font-family: "Open Sans", sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   margin: 0;
-  background-color: #f0f0f0;
+  background-color: #323232;
 }
 
 #content {
@@ -16,14 +16,14 @@ body {
 
 table {
   border-collapse: collapse;
-  background-color: white;
+  background-color: #323232;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 td {
-  width: 80px;
-  height: 80px;
-  border: 2px solid #333;
+  width: 90px;
+  height: 90px;
+  border: 5px solid white;
   text-align: center;
   vertical-align: middle;
   font-size: 32px;
@@ -33,5 +33,23 @@ td {
 }
 
 td:hover {
-  background-color: #e0e0e0;
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+td:first-child,
+td:nth-child(3n + 1) {
+  border-left: none;
+}
+
+td:last-child,
+td:nth-child(3n) {
+  border-right: none;
+}
+
+tr:first-child td {
+  border-top: none;
+}
+
+tr:last-child td {
+  border-bottom: none;
 }
