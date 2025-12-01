@@ -1,13 +1,15 @@
-let fields = [
-    null,
-    "cross",
-    null,
-    "circle",
-    null,
-    null,
-    null,
-    null,
-    null];
+let currentPlayer = "circle"; // circle beginnt
+let fields = [null, null, null, null, null, null, null, null, null];
+const winConditions = [
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+  [0, 3, 6],
+  [1, 4, 7],
+  [2, 5, 8],
+  [0, 4, 8],
+  [2, 4, 6],
+];
 
 function init() {
   render();
@@ -27,10 +29,9 @@ function render() {
         cellContent = svgCircleAnimated();
       } else if (field === "cross") {
         cellContent = svgCrossAnimated();
-        ("circle");
       }
 
-      tableHTML += `<td>${cellContent}</td>`;
+      tableHTML += `<td onclick="handleClick(${index}, this)">${cellContent}</td>`;
     }
     tableHTML += "</tr>";
   }
@@ -39,13 +40,71 @@ function render() {
   document.getElementById("content").innerHTML = tableHTML;
 }
 
-// Erzeugt ein animiertes SVG-Kreis-Icon als HTML-String
-function svgCircleAnimated({
-  size = 70,
-  color = "#00B0EF",
-  strokeWidth = 4,
-  duration = "500ms"
-} = {}) {
+function handleClick(index, tdElement) {
+  if (fields[index] !== null) return;
+
+  fields[index] = currentPlayer;
+
+  if (currentPlayer === "circle") {
+    tdElement.innerHTML = svgCircleAnimated();
+  } else {
+    tdElement.innerHTML = svgCrossAnimated();
+  }
+
+  tdElement.onclick = null;
+
+  const winningCombo = checkWin();
+  if (winningCombo) {
+    drawWinningLine(winningCombo);
+
+    document.querySelectorAll("td").forEach((td) => (td.onclick = null));
+    return;
+  }
+
+  currentPlayer = currentPlayer === "circle" ? "cross" : "circle";
+}
+
+function checkWin() {
+  for (const combo of winConditions) {
+    const [a, b, c] = combo;
+    if (fields[a] && fields[a] === fields[b] && fields[a] === fields[c]) {
+      return combo;
+    }
+  }
+  return null;
+}
+
+function drawWinningLine(combo) {
+  const cells = combo.map((i) => document.querySelectorAll("td")[i]);
+
+  const rect1 = cells[0].getBoundingClientRect();
+  const rect3 = cells[2].getBoundingClientRect();
+
+  const x1 = rect1.left + rect1.width / 2;
+  const y1 = rect1.top + rect1.height / 2;
+  const x3 = rect3.left + rect3.width / 2;
+  const y3 = rect3.top + rect3.height / 2;
+
+  const dx = x3 - x1;
+  const dy = y3 - y1;
+  const length = Math.sqrt(dx * dx + dy * dy);
+  const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+
+  const line = document.createElement("div");
+  line.style.position = "fixed";
+  line.style.left = `${x1}px`;
+  line.style.top = `${y1}px`;
+  line.style.width = `${length}px`;
+  line.style.height = "6px";
+  line.style.backgroundColor = "white";
+  line.style.transformOrigin = "left center";
+  line.style.transform = `rotate(${angle}deg)`;
+  line.style.zIndex = 1000;
+
+  document.body.appendChild(line);
+}
+
+function svgCircleAnimated({ size = 70, color = "#00B0EF", strokeWidth = 4, duration = "500ms" } = {}) {
   const cx = size / 2;
   const r = (size - strokeWidth) / 2;
   const circumference = (2 * Math.PI * r).toFixed(2);
@@ -74,19 +133,12 @@ function svgCircleAnimated({
 </svg>`;
 }
 
-function svgCrossAnimated({
-  size = 70,
-  color = "#FFC000",
-  strokeWidth = 4,
-  duration = "0.5s"
-} = {}) {
-
+function svgCrossAnimated({ size = 70, color = "#FFC000", strokeWidth = 4, duration = "0.5s" } = {}) {
   const half = size / 2;
-  const offset = strokeWidth; // kleiner Randabstand
+  const offset = strokeWidth;
   const start = offset;
   const end = size - offset;
-
-  // Länge der Linie (diagonal kehrt der Satz des Pythagoras zurück)
+  
   const lineLength = Math.sqrt((end - start) ** 2 * 2).toFixed(2);
 
   return `
@@ -103,7 +155,6 @@ function svgCrossAnimated({
       animation: draw ${duration} linear forwards;
     }
 
-    /* zweite Linie startet leicht zeitversetzt */
     .delay {
       animation-delay: 0.2s;
     }
@@ -113,7 +164,6 @@ function svgCrossAnimated({
     }
   </style>
 
-  <!-- Diagonalen des X -->
   <line class="line" x1="${start}" y1="${start}" x2="${end}" y2="${end}" />
   <line class="line delay" x1="${start}" y1="${end}" x2="${end}" y2="${start}" />
 </svg>
