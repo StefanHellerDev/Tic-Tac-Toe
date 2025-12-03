@@ -81,9 +81,9 @@ function drawWinningLine(combo) {
   const rect3 = cells[2].getBoundingClientRect();
 
   const x1 = rect1.left + rect1.width / 2;
-  const y1 = rect1.top + rect1.height / 2;
+  const y1 = rect1.top + rect1.height / 2 - 3;
   const x3 = rect3.left + rect3.width / 2;
-  const y3 = rect3.top + rect3.height / 2;
+  const y3 = rect3.top + rect3.height / 2 - 3;
 
   const dx = x3 - x1;
   const dy = y3 - y1;
@@ -104,7 +104,7 @@ function drawWinningLine(combo) {
   document.body.appendChild(line);
 }
 
-function svgCircleAnimated({ size = 70, color = "#00B0EF", strokeWidth = 4, duration = "500ms" } = {}) {
+function svgCircleAnimated({ size = 70, color = "#00B0EF", strokeWidth = 4, duration = "250ms" } = {}) {
   const cx = size / 2;
   const r = (size - strokeWidth) / 2;
   const circumference = (2 * Math.PI * r).toFixed(2);
@@ -133,12 +133,12 @@ function svgCircleAnimated({ size = 70, color = "#00B0EF", strokeWidth = 4, dura
 </svg>`;
 }
 
-function svgCrossAnimated({ size = 70, color = "#FFC000", strokeWidth = 4, duration = "0.5s" } = {}) {
+function svgCrossAnimated({ size = 70, color = "#FFC000", strokeWidth = 4, duration = "250ms" } = {}) {
   const half = size / 2;
   const offset = strokeWidth;
   const start = offset;
   const end = size - offset;
-  
+
   const lineLength = Math.sqrt((end - start) ** 2 * 2).toFixed(2);
 
   return `
