@@ -1,4 +1,4 @@
-let currentPlayer = "circle"; // circle beginnt
+let currentPlayer = "circle";
 let fields = [null, null, null, null, null, null, null, null, null];
 const winConditions = [
   [0, 1, 2],
@@ -57,6 +57,15 @@ function handleClick(index, tdElement) {
   if (winningCombo) {
     drawWinningLine(winningCombo);
 
+    document.getElementById("restartBtn").classList.add("pulse");
+
+    document.querySelectorAll("td").forEach((td) => (td.onclick = null));
+    return;
+  }
+
+  if (checkDraw()) {
+    document.getElementById("restartBtn").classList.add("pulse");
+
     document.querySelectorAll("td").forEach((td) => (td.onclick = null));
     return;
   }
@@ -72,6 +81,21 @@ function checkWin() {
     }
   }
   return null;
+}
+
+function checkDraw() {
+  return fields.every((f) => f !== null) && !checkWin();
+}
+
+function restartGame() {
+  fields = [null, null, null, null, null, null, null, null, null];
+  currentPlayer = "circle";
+
+  document.getElementById("restartBtn").classList.remove("pulse");
+
+  document.querySelectorAll(".win-line").forEach((line) => line.remove());
+
+  render();
 }
 
 function drawWinningLine(combo) {
@@ -91,6 +115,8 @@ function drawWinningLine(combo) {
   const angle = Math.atan2(dy, dx) * (180 / Math.PI);
 
   const line = document.createElement("div");
+  line.classList.add("win-line");
+
   line.style.position = "fixed";
   line.style.left = `${x1}px`;
   line.style.top = `${y1}px`;
